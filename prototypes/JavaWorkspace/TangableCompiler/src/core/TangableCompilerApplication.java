@@ -1,8 +1,8 @@
 package core;
 
 import interpreter.InterpreterVisitor;
-import ast.Program;
 import lexer.Lexer;
+import ast.Program;
 
 /**
  * Main application entry point for TangableCompilerApplication test program

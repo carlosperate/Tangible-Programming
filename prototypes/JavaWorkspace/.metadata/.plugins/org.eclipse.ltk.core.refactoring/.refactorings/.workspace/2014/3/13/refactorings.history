@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Delete resource &apos;TangableCompiler&apos;" deleteContents="true" description="Delete resource &apos;TangableCompiler&apos;" element1="/TangableCompiler" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1395647774023"/>
-</session>
