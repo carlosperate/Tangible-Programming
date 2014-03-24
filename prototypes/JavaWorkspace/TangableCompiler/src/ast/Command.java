@@ -3,7 +3,6 @@ package ast;
 import lexer.Lexer;
 import lexer.Token;
 import core.LanguageDefinition.CommandTokenDefinition;
-import core.LanguageDefinition.TokenDefinition;
 
 public class Command extends Statement{
 	

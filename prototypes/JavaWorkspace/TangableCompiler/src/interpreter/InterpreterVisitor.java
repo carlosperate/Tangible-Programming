@@ -2,11 +2,9 @@ package interpreter;
 
 import java.util.Stack;
 
-import javax.swing.SwingUtilities;
-
 import ast.Command;
-import ast.Loop;
 import ast.LiteralNumber;
+import ast.Loop;
 import ast.Program;
 import ast.Statement;
 import ast.Visitor;

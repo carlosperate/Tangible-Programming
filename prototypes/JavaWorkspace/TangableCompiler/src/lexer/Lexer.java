@@ -14,7 +14,6 @@ import core.LanguageDefinition;
 import core.LanguageDefinition.CommandTokenDefinition;
 import core.LanguageDefinition.KeywordTokenDefinition;
 import core.LanguageDefinition.NumberTokenDefinition;
-import core.TangableCompilerApplication;
 import core.LanguageDefinition.TokenDefinition;
 
 /**
