@@ -1,5 +1,6 @@
 package core;
 
+import exceptions.SyntaxException;
 import interpreter.InterpreterVisitor;
 import lexer.Lexer;
 import ast.Program;
@@ -14,7 +15,7 @@ import ast.Program;
 public class TangableCompilerApplication {
 
 	public static void main(String[] args){
-		
+
 		boolean result = true;
 
 		/**
@@ -33,23 +34,24 @@ public class TangableCompilerApplication {
 		 * Using the supplied .tang file, attempt to convert the primitive token ID's into
 		 * valid tokens ready to send to the application
 		 */
-		result = Lexer.Lex("sampleProgram1.tang");
-		if(!result){
+		try {
+			result = Lexer.Lex("sampleProgram1.tang");
+		} catch (SyntaxException e) {
 			System.err.println("Lexing Failed");
 			return;
 		}
 
 		System.out.println("Program Lexing Complete");
-		
-		
+
+
 		/**
 		 * Using the statically reference Lexer tokens, create a AST from the current token
 		 * list
 		 */
 		Program p = new Program();
 		p.parse();
-		
-		
+
+
 		/**
 		 * Send the interpreter using pre-order traversal on the AST.
 		 */

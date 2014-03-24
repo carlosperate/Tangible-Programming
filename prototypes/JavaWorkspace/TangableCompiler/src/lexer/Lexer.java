@@ -5,34 +5,36 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Stack;
 
 import ast.Command;
+import ast.Keyword;
 import ast.LiteralNumber;
+import ast.Statement;
 import core.LanguageDefinition;
-import core.LanguageDefinition.CommandTokenDefinition;
-import core.LanguageDefinition.KeywordTokenDefinition;
-import core.LanguageDefinition.NumberTokenDefinition;
-import core.LanguageDefinition.TokenDefinition;
+import exceptions.SyntaxException;
 
 /**
- * @author Paul
- *
+ * Lex's the supplied input file and produces a list of tokens
+ * Instanced to the correct type to allow single look ahead
+ * 
+ * @author Paul Hickman
+ * 
  */
 public class Lexer {
 
+	/**
+	 * List of token objects created by lexing input file
+	 */
 	public static final Stack<Token> tokenList = new Stack<Token>();
-
 	
-	public static HashMap<String, Lexeme> registerKeywords = 
-			new HashMap<String, Lexeme>();
-	
-	public static boolean Lex(String fileName){
-
-		// Add keywords
-		registerKeywords.put("Loop-Start", Lexeme.LOOPSTART);
-		registerKeywords.put("Loop-End", Lexeme.LOOPEND);
+	/**
+	 * Lex's supplied CSV file
+	 * @param fileName - file to be lexed
+	 * @return false is file was unable to be lexed correctly, true is successful
+	 * @throws SyntaxException 
+	 */
+	public static boolean Lex(String fileName) throws SyntaxException{
 		
 		BufferedReader br = null;
 		String tokenData = "";
@@ -47,24 +49,21 @@ public class Lexer {
 
 				for(String s : tokens){
 
-					TokenDefinition tokDef = lang.tokens.get(Integer.parseInt(s));
+					Statement tokDef = lang.tokens.get(Integer.parseInt(s));
 					
 					if(tokDef != null){
 						
-						if(tokDef instanceof CommandTokenDefinition){
-							tokenList.add(new Command((CommandTokenDefinition)tokDef));
-						}else if(tokDef instanceof KeywordTokenDefinition){
-							if(registerKeywords.containsKey(tokDef.name)){
-								tokenList.add(registerKeywords.get(tokDef.name));
-							}
-							//TODO Error
-						}else if(tokDef instanceof NumberTokenDefinition){
-							tokenList.add(new LiteralNumber((NumberTokenDefinition)tokDef));
-							
+						if(tokDef instanceof Command){
+							tokenList.add((Command)tokDef);
+						}else if(tokDef instanceof Keyword){
+							tokenList.add((Keyword)tokDef);
+						}else if(tokDef instanceof LiteralNumber){
+							tokenList.add((LiteralNumber)tokDef);
 						}
 					
 					}else{
-						//TODO Found token that does not exist in lang def
+						br.close();
+						throw new SyntaxException();
 					}
 				}
 				
@@ -84,6 +83,10 @@ public class Lexer {
 		return true;
 	}
 
+	/**
+	 * Flip the token stack. Recursively called
+	 * @param s
+	 */
 	private static void stackReversal(Stack<Token> s)
 	{
 		if(s.size() == 0) return;
@@ -92,6 +95,11 @@ public class Lexer {
 		s.push(n);
 	}
 	
+	/**
+	 * Support function for "stackReversal"
+	 * @param s
+	 * @return
+	 */
     private static Token getLast(Stack<Token> s)
     {
     	Token t = s.pop();
@@ -108,27 +116,32 @@ public class Lexer {
     }
 	
 
-	public static Token getPeekNextToken(){
+    /**
+     * peek at the next token on the lexer stack
+     * @return
+     */
+	public static Token peek(){
 		if(tokenList.isEmpty())
 			return null;
 
 		return tokenList.peek();
 	}
 	
-	public static Token getPopNextToken(){
+	/**
+	 * pop the next token off the lexer stack
+	 * @return
+	 */
+	public static Token pop(){
 		if(tokenList.isEmpty())
 			return null;
 
 		return tokenList.pop();
 	}
-	
-	public static Token lookahead(int n){
-		if (!isEmpty()) {
-			return tokenList.get(n-1); 
-		}
-		return null;
-	}
 
+	/**
+	 * Check if the lexer stack is empty
+	 * @return false if empty, true if size 
+	 */
 	public static boolean isEmpty(){
 		return tokenList.empty();
 	}

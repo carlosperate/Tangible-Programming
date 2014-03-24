@@ -2,8 +2,6 @@ package ast;
 
 import java.util.LinkedList;
 import java.util.List;
-
-import lexer.Lexeme;
 import lexer.Lexer;
 import lexer.Token;
 
@@ -20,14 +18,16 @@ public class Program extends ASTToken{
 	}
 
 	public static Statement parseNextStatement(){
-		Token next = Lexer.getPeekNextToken();
+		Token next = Lexer.peek();
 
 		if(next instanceof Command){
 			return (Command) new Command().parse();
-		}else if (next == Lexeme.LOOPSTART){
-			return (Loop) new Loop().parse();
+		}else if (next instanceof Keyword){
+			if(((Keyword)next).name.equals("Loop-Start")){
+				return (Loop) new Loop().parse();
+			}
 		}
-		
+
 		return null;
 	}
 

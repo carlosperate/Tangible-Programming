@@ -2,7 +2,6 @@ package ast;
 
 import lexer.Lexer;
 import lexer.Token;
-import core.LanguageDefinition.NumberTokenDefinition;
 
 public class LiteralNumber extends Statement{
 	
@@ -22,22 +21,22 @@ public class LiteralNumber extends Statement{
 		this.name = name;
 	}
 	
-	public LiteralNumber(NumberTokenDefinition definition){
-		this.name = definition.name;
-		this.outputId = definition.outputId;
-		this.tokenId = definition.tokenId;
-		this.value = definition.value;
+	public LiteralNumber(String name, int tokenId, int outputId, int value){
+		this.name = name;
+		this.tokenId = tokenId;
+		this.outputId = outputId;
+		this.value = value;
 	}
 	
 	@Override
 	public ASTToken parse() {
-		Token t = Lexer.getPeekNextToken();
+		Token t = Lexer.peek();
 		
 		if(t instanceof LiteralNumber){
 			do{
-				t = Lexer.getPopNextToken();
+				t = Lexer.pop();
 				builder.append(((LiteralNumber)t).value);
-				t = Lexer.getPeekNextToken();
+				t = Lexer.peek();
 				
 			}while(t instanceof LiteralNumber);
 			

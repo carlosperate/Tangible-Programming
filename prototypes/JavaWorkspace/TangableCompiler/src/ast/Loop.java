@@ -3,7 +3,6 @@ package ast;
 import java.util.LinkedList;
 import java.util.List;
 
-import lexer.Lexeme;
 import lexer.Lexer;
 import lexer.Token;
 
@@ -12,28 +11,37 @@ public class Loop extends Statement{
 	public final List<Statement> statements = new LinkedList<Statement>();
 	
 	public LiteralNumber numberCounter;
+	
+	public boolean blockEndFound = false;
 
 	@Override
 	public ASTToken parse() {
 
 		// Remove loop start token
-		Lexer.getPopNextToken();
+		Lexer.pop();
 
-		Token next = Lexer.getPeekNextToken();
+		Token next = Lexer.peek();
 		
 		if(next instanceof LiteralNumber){
 			numberCounter = (LiteralNumber) new LiteralNumber().parse();
-			next = Lexer.getPeekNextToken();
-			while(next != Lexeme.LOOPEND){
+			next = Lexer.peek();
+			while(!blockEndFound){
 				statements.add(Program.parseNextStatement());
-				next = Lexer.getPeekNextToken();
+				next = Lexer.peek();
+				
+				// Test for end of loop block
+				if(next instanceof Keyword){
+					if(((Keyword)next).name.equals("Loop-End")){
+						blockEndFound = true;
+					}
+				}
 			}
 		}else{
 			System.out.println("ERROR");
 		}
 
 
-		Lexer.getPopNextToken();
+		Lexer.pop();
 
 		return this;
 	}

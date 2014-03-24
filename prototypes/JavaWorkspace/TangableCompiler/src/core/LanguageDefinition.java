@@ -16,6 +16,11 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import ast.Command;
+import ast.Keyword;
+import ast.LiteralNumber;
+import ast.Statement;
+
 /**
  * Responsible for parsing and generating a list of all tokens for use as part of
  * the current language. The language consists of the following token types:
@@ -32,8 +37,8 @@ public class LanguageDefinition {
 	/**
 	 * Map of all valid token currently available within the language
 	 */
-	public final Map<Integer, TokenDefinition> tokens = 
-			new HashMap<Integer, TokenDefinition>();
+	public final Map<Integer, Statement> tokens = 
+			new HashMap<Integer, Statement>();
 
 	/**
 	 * Static instance to facilitate the Singleton Pattern
@@ -83,7 +88,7 @@ public class LanguageDefinition {
 					Element eElement = (Element) nNode;
 
 					tokens.put(Integer.parseInt(eElement.getAttribute("tokenId")),
-							new CommandTokenDefinition(eElement.getAttribute("name"), 
+							new Command(eElement.getAttribute("name"), 
 									Integer.parseInt(eElement.getAttribute("tokenId")), 
 									Integer.parseInt(eElement.getAttribute("outputId")),
 									Integer.parseInt(eElement.getAttribute("waitTime"))));
@@ -102,7 +107,7 @@ public class LanguageDefinition {
 					Element eElement = (Element) nNode;
 
 					tokens.put(Integer.parseInt(eElement.getAttribute("tokenId")),
-							new KeywordTokenDefinition(eElement.getAttribute("name"), 
+							new Keyword(eElement.getAttribute("name"), 
 									Integer.parseInt(eElement.getAttribute("tokenId")), 
 									Integer.parseInt(eElement.getAttribute("outputId"))));
 				}
@@ -120,7 +125,7 @@ public class LanguageDefinition {
 					Element eElement = (Element) nNode;
 
 					tokens.put(Integer.parseInt(eElement.getAttribute("tokenId")),
-							new NumberTokenDefinition(eElement.getAttribute("name"), 
+							new LiteralNumber(eElement.getAttribute("name"), 
 									Integer.parseInt(eElement.getAttribute("tokenId")), 
 									Integer.parseInt(eElement.getAttribute("outputId")),
 									Integer.parseInt(eElement.getAttribute("value"))));
@@ -139,50 +144,5 @@ public class LanguageDefinition {
 		}
 
 		return true;
-	}
-
-	public abstract class TokenDefinition{
-
-		public String name;
-		public int tokenId;
-		public int outputId;
-
-		public TokenDefinition(String name, int tokenId, int outputId){
-			this.name = name;
-			this.tokenId = tokenId;
-			this.outputId = outputId;
-		}
-
-	}
-
-	public class CommandTokenDefinition extends TokenDefinition{
-
-		public int waitTime;
-		
-		public CommandTokenDefinition(String name, int tokenId, int outputId, int waitTime) {
-			super(name, tokenId, outputId);
-			this.waitTime = waitTime;
-		}
-		
-	}
-	
-	public class KeywordTokenDefinition extends TokenDefinition{
-
-		public KeywordTokenDefinition(String name, int tokenId, int outputId) {
-			super(name, tokenId, outputId);
-		}
-		
-	}
-	
-	public class NumberTokenDefinition extends TokenDefinition{
-
-		public int value;
-		
-		public NumberTokenDefinition(String name, int tokenId, int outputId, int value) {
-			super(name, tokenId, outputId);
-			
-			this.value = value;
-		}
-		
 	}
 }

@@ -2,7 +2,6 @@ package ast;
 
 import lexer.Lexer;
 import lexer.Token;
-import core.LanguageDefinition.CommandTokenDefinition;
 
 public class Command extends Statement{
 	
@@ -19,11 +18,11 @@ public class Command extends Statement{
 		this.name = name;
 	}
 	
-	public Command(CommandTokenDefinition definition){
-		this.name = definition.name;
-		this.outputId = definition.outputId;
-		this.tokenId = definition.tokenId;
-		this.waitTime = definition.waitTime;
+	public Command(String name, int tokenId, int outputId, int waitTime){
+		this.name = name;
+		this.tokenId = tokenId;
+		this.outputId = outputId;
+		this.waitTime = waitTime;
 	}
 
 	@Override
@@ -33,7 +32,7 @@ public class Command extends Statement{
 
 	@Override
 	public ASTToken parse() {
-		Token tok = Lexer.getPopNextToken();
+		Token tok = Lexer.pop();
 		if(tok instanceof Command){
 			Command cmd = (Command)tok;
 			name = cmd.name;

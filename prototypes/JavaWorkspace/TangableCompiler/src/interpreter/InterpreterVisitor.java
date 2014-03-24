@@ -9,23 +9,34 @@ import ast.Program;
 import ast.Statement;
 import ast.Visitor;
 
+/**
+ * The interpreter for the application.
+ * Utilises the visitor pattern to walk the AST to interpret the application
+ * 
+ * @author Paul Hickman
+ *
+ */
 public class InterpreterVisitor implements Visitor{
 
+	/**
+	 * Project Stack. Stores variables and resolved sub branches of the AST
+	 */
 	private final Stack<Object> results = new Stack<Object>();
 	
+	/**
+	 * Indentation counter to make the output more presentable
+	 */
 	private int indentCnt = 0;
+	
 	
 	@Override
 	public void visit(LiteralNumber number) {
 		results.push(number.value);
-	
 	}
 	
 	@Override
 	public void visit(Command cmd) {
-		
 		System.out.println(getIndentation() + cmd.name);
-		
 		try {
 			Thread.sleep(cmd.waitTime);
 		} catch (InterruptedException e) {
