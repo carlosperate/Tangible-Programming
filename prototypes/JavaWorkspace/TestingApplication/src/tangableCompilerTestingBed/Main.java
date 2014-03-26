@@ -1,18 +1,12 @@
-package core;
+package tangableCompilerTestingBed;
 
-import exceptions.SyntaxException;
 import interpreter.InterpreterVisitor;
 import lexer.Lexer;
 import ast.Program;
+import core.LanguageDefinition;
+import exceptions.SyntaxException;
 
-/**
- * Main application entry point for TangableCompilerApplication test program
- * 
- * @author Paul Hickman
- * @version 1.0
- *
- */
-public class TangableCompilerApplication {
+public class Main {
 
 	public static void main(String[] args){
 
