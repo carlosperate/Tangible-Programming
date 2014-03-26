@@ -1,0 +1,25 @@
+<LanguageDefinition name="Prototype Language 1">
+	
+    <!--  Commands  -->
+	<CommandToken name="Forward" waitTime="1000" tokenId="0" outputId="0"/>
+	<CommandToken name="Backward" waitTime="1000" tokenId="1" outputId="1"/>
+	<CommandToken name="TurnLeft" waitTime="1000" tokenId="2" outputId="2"/>
+	<CommandToken name="TurnRight" waitTime="1000" tokenId="3" outputId="3"/>
+	
+	<!-- Literal Numbers -->
+	<NumberToken name="#0" value="0" tokenId="200" outputId="200" />
+	<NumberToken name="#1" value="1" tokenId="201" outputId="201" />
+	<NumberToken name="#2" value="2" tokenId="202" outputId="202" />
+	<NumberToken name="#3" value="3" tokenId="203" outputId="203" />
+	<NumberToken name="#4" value="4" tokenId="204" outputId="204" />
+	<NumberToken name="#5" value="5" tokenId="205" outputId="205" />
+	<NumberToken name="#6" value="6" tokenId="206" outputId="206" />
+	<NumberToken name="#7" value="7" tokenId="207" outputId="207" />
+	<NumberToken name="#8" value="8" tokenId="208" outputId="208" />
+	<NumberToken name="#9" value="9" tokenId="209" outputId="209" />
+	
+	<!-- Flow Control Keywords DON'T CHANGE NAME -->
+	<KeywordToken name="Loop-Start" tokenId="100" outputId="100" />
+	<KeywordToken name="Loop-End" tokenId="101" outputId="110" />
+	
+</LanguageDefinition>
