@@ -24,7 +24,7 @@ public class InterpreterVisitor implements Visitor{
 	private final Stack<Object> results = new Stack<Object>();
 	
 	/**
-	 * Indentation counter to make the output more presentable
+	 * Indentation counter to make the output more readable
 	 */
 	private int indentCnt = 0;
 	
@@ -59,7 +59,8 @@ public class InterpreterVisitor implements Visitor{
 
 	@Override
 	public void visit(Program program) {
-		return;
+		for(Statement s : program.statements)
+			s.acceptPreOrder(this);
 	}
 	
 	private String getIndentation(){

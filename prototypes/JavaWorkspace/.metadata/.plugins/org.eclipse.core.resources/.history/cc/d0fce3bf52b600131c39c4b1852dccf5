@@ -1,0 +1,17 @@
+public class sameprogram.java.java{
+
+	public static void main(String[] args){
+		Backward();
+		TurnLeft();
+		for(int i = 0; i < 3; i++){
+			Forward();
+			for(int i = 0; i < 4; i++){
+				Backward();
+			}
+			Forward();
+		}
+		Backward();
+		TurnLeft();
+		TurnRight();
+}
+}

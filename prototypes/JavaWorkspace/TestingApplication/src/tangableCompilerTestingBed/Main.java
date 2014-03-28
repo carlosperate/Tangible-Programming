@@ -1,5 +1,9 @@
 package tangableCompilerTestingBed;
 
+import compilers.AnsiCGenerator;
+import compilers.ArduinoGenerator;
+import compilers.JavaGenerator;
+import compilers.PythonGenerator;
 import interpreter.InterpreterVisitor;
 import lexer.Lexer;
 import ast.Program;
@@ -45,10 +49,38 @@ public class Main {
 		Program p = new Program();
 		p.parse();
 
-
 		/**
-		 * Send the interpreter using pre-order traversal on the AST.
+		 * Generate python script from tangible application
+		 */
+		PythonGenerator python = new PythonGenerator("program");
+		p.acceptInOrder(python);
+		python.CloseSourceFile();
+		
+		/**
+		 * Generate java script from tangible application
+		 */
+		JavaGenerator java = new JavaGenerator("program");
+		p.acceptInOrder(java);
+		java.CloseSourceFile();
+		
+		/**
+		 * Generate ANSI-C script from tangible application
+		 */
+		AnsiCGenerator ansiC = new AnsiCGenerator("program");
+		p.acceptInOrder(ansiC);
+		ansiC.CloseSourceFile();
+		
+		/**
+		 * Generate Arduino script from tangible application
+		 */
+		ArduinoGenerator ardiuno = new ArduinoGenerator("program");
+		p.acceptInOrder(ardiuno);
+		ardiuno.CloseSourceFile();
+		
+		/**
+		 * Interpret the application 
 		 */
 		p.acceptPreOrder(new InterpreterVisitor());
+		
 	}
 }

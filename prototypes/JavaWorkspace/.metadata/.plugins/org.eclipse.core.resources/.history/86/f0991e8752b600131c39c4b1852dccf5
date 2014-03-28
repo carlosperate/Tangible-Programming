@@ -1,0 +1,12 @@
+import sys
+
+Backward()
+TurnLeft()
+for x in range(0, 3):
+	Forward()
+	for x in range(0, 4):
+		Backward()
+	Forward()
+Backward()
+TurnLeft()
+TurnRight()

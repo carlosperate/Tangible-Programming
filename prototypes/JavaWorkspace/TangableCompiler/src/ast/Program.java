@@ -34,22 +34,16 @@ public class Program extends ASTToken{
 	@Override
 	public void acceptPreOrder(Visitor visitor) {
 		visitor.visit(this);
-		for(Statement st : statements)
-			st.acceptPreOrder(visitor);
 	}
 
 	@Override
 	public void acceptPostOrder(Visitor visitor) {
 		visitor.visit(this);
-		for(Statement st : statements)
-			st.acceptPreOrder(visitor);
 	}
 
 	@Override
 	public void acceptInOrder(Visitor visitor) {
 		visitor.visit(this);
-		for(Statement st : statements)
-			st.acceptPreOrder(visitor);
 	}
 
 
