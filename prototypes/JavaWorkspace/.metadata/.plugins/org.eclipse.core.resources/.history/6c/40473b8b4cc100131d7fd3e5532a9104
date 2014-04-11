@@ -1,0 +1,17 @@
+package arena;
+
+import java.awt.Graphics;
+
+public class Robot extends SceneNode{
+
+	public Robot(int xPos, int yPos){
+		this.xPos = xPos;
+		this.yPos = yPos;
+	}
+	
+	@Override
+	public void Draw(Graphics g) {
+		g.drawRect(Arena.cellWidth * xPos, yPos, 100, 100);
+	}
+
+}

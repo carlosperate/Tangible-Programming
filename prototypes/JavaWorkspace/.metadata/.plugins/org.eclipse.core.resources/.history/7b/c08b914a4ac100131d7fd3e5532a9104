@@ -1,0 +1,10 @@
+package arena;
+
+public class Robot extends SceneNode{
+
+	@Override
+	public void Draw() {
+		
+	}
+
+}

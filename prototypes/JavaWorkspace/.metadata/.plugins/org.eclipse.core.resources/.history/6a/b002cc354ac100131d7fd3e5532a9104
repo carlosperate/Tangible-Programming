@@ -1,0 +1,12 @@
+package arena;
+
+public class Robot implements SceneNode{
+
+	
+	
+	@Override
+	public void Render() {
+		
+	}
+
+}

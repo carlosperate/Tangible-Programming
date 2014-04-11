@@ -1,7 +1,0 @@
-package compilers;
-
-import ast.Visitor;
-
-public class JavaGenerator implements Visitor{
-
-}

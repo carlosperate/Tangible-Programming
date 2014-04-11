@@ -1,0 +1,6 @@
+package arena;
+
+public interface SceneNode {
+
+	void Draw();
+}

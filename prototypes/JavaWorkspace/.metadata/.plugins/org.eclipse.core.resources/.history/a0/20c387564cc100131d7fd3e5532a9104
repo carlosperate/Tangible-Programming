@@ -1,0 +1,69 @@
+package arena;
+
+import java.awt.Color;
+import java.awt.Graphics;
+import java.util.*;
+
+import javax.swing.JFrame;
+
+public class Arena extends JFrame{
+	
+	private final int numOfRows;
+
+	private final int numOfColumns;
+	
+	private final static int cellWidth;
+	
+	private final static int cellHeight;
+	
+	private final boolean drawGridLines;
+	
+	public List<SceneNode> nodes = new ArrayList<SceneNode>();
+	
+	
+	
+	public Arena(int numOfRows, int numOfColumns, int width, int height, boolean drawGridLines){
+		super("Tangble Programming Arena");
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setSize(width,height);
+		
+		this.numOfRows = numOfRows;
+		this.numOfColumns = numOfColumns;
+		
+		this.cellWidth = width / numOfColumns;
+		this.cellHeight = height / numOfRows;
+		
+		this.drawGridLines = drawGridLines;
+		
+		// Add new robot
+		nodes.add(new Robot(50, 50));
+		
+		nodes.add(new Robot(200, 300));
+		
+		setVisible(true);
+	}
+
+	@Override
+	public void paint(Graphics g) {
+		super.paint(g);
+		
+		if(drawGridLines){
+			Color color = g.getColor();
+			g.setColor(Color.LIGHT_GRAY);
+			for(int c = 0; c < numOfColumns; c++){
+				g.drawLine(cellWidth * c, 0, cellWidth * c, getSize().height);
+			}
+			
+			for(int r = 0; r < numOfRows; r++){
+				g.drawLine(0, cellHeight * r, getSize().width, cellHeight * r);
+			}
+			g.setColor(color);
+		}
+		
+		for(SceneNode sn : nodes){
+			sn.Draw(g);
+		}
+	}
+	
+	
+}

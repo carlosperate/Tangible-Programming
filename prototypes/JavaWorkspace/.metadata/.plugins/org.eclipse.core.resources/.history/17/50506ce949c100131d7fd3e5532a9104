@@ -1,0 +1,11 @@
+package arena;
+
+public class Robot implements SceneNode{
+
+	@Override
+	public void Render() {
+		// TODO Auto-generated method stub
+		
+	}
+
+}

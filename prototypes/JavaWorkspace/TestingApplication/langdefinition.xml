@@ -1,10 +1,11 @@
 <LanguageDefinition name="Prototype Language 1">
 	
     <!--  Commands  -->
-	<CommandToken name="Forward" waitTime="1000" tokenId="0" outputId="0"/>
-	<CommandToken name="Backward" waitTime="1000" tokenId="1" outputId="1"/>
-	<CommandToken name="TurnLeft" waitTime="1000" tokenId="2" outputId="2"/>
-	<CommandToken name="TurnRight" waitTime="1000" tokenId="3" outputId="3"/>
+	<CommandToken name="Forward" waitTime="1000" tokenId="0" outputId="102"/>
+	<CommandToken name="Backward" waitTime="1000" tokenId="1" outputId="98"/>
+	<CommandToken name="TurnLeft" waitTime="1000" tokenId="2" outputId="108"/>
+	<CommandToken name="TurnRight" waitTime="1000" tokenId="3" outputId="114"/>
+	<CommandToken name="Beep" waitTime="1000" tokenId="4" outputId="254"/>
 	
 	<!-- Literal Numbers -->
 	<NumberToken name="#0" value="0" tokenId="200" outputId="200" />
