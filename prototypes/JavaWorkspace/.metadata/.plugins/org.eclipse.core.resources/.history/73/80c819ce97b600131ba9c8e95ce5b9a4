@@ -1,0 +1,20 @@
+package serialComms;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+public class TwoWaySerialComm {
+
+	public static void main(String []args){
+		try{
+			new TwoWaySerialComm().connect("/dev/ttyUSB0");
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	void connect(String portName){
+		CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(portName);
+	}
+}

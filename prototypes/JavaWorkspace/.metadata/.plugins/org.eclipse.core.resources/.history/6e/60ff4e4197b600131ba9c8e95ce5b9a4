@@ -1,0 +1,5 @@
+package serialComms;
+
+public class TwoWaySerialComm {
+
+}
