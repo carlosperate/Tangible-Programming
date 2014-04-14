@@ -1,0 +1,39 @@
+package server;
+
+import javax.bluetooth.*;
+import javax.microedition.io.*;
+
+public class EchoServer {
+	
+	public final UUID uuid = new UUID("1101", false);
+	
+	public final String name = "Window Echo Server";
+	
+	public final String url = "btspp://localhost:" + uuid + ";name=" + name + ";authenticate=false;encrypt=false;";
+	
+	LocalDevice local = null;
+	
+	StreamConnectionNotifier server = null;
+	
+	StreamConnection conn = null;
+	
+	public EchoServer(){
+		try{
+			
+			System.out.println("Setting device to be discoverable...");
+			local = LocalDevice.getLocalDevice();
+			local.setDiscoverable(DiscoveryAgent.GIAC);
+			
+			System.out.println("Start advertising service...");
+			
+			server = (StreamConnectionNotifier)Connector.open(url);
+			
+			System.out.println("Waiting for incoming connection...");
+
+			
+		}catch(Exception e){
+			System.out.println("Exception Occured: " + e.toString());
+		}
+	}
+	
+}

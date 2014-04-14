@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+ddms.logcat.auotmonitor.level=error
+ddms.logcat.automonitor.userprompt=true
+>>>>>>> b76561c634e115023f239c8027a561e0d86add24
 eclipse.preferences.version=1
 logcat.view.colsize.Application=143
 logcat.view.colsize.Level=29

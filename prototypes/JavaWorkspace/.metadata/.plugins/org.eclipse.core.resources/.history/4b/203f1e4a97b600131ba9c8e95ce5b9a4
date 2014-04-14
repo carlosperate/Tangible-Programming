@@ -1,0 +1,8 @@
+package serialComms;
+
+public class TwoWaySerialComm {
+
+	void connect(String portName){
+		
+	}
+}
