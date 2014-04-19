@@ -39,8 +39,8 @@ public class BluetoothUtility extends Activity{
 
 	// Mac-Address of blue tooth module
 	// NOTE: Change to match remote device address, tested on both windows and rPi
-	//private static String address = "00:15:83:0C:BF:EB";		// rPi module address
-	private static String address = "00:1F:81:00:08:30";		// Windows module address
+	private static String address = "00:15:83:0C:BF:EB";		// rPi module address
+	//private static String address = "00:1F:81:00:08:30";		// Windows module address
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -60,16 +60,24 @@ public class BluetoothUtility extends Activity{
 			}
 		});
 
-		message = (TextView)findViewById(R.id.message);
-
-		Button sendMsgBtn = (Button)findViewById(R.id.send_message_btn);
-		sendMsgBtn.setOnClickListener(new OnClickListener() {
+		
+		Button sendFEBtn = (Button)findViewById(R.id.send_ack_received_btn);
+		sendFEBtn.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				sendData(0xFE);
-				//log.append(">> Sending: " + message.getText().toString() + "\n");
-				//sendData(message.getText().toString());
+				byte data = (byte)0xfe; 
+				sendData(data);
+			}
+		});
+		
+		Button sendFDBtn = (Button)findViewById(R.id.send_ack_completed_btn);
+		sendFDBtn.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				byte data = (byte)0xfd; 
+				sendData(data);
 			}
 		});
 	}
@@ -120,10 +128,8 @@ public class BluetoothUtility extends Activity{
 				while(!inStreamMonitorStop){
 					try {
 						if(r.ready()){
-							final String line = r.readLine();
-							if(line != ""){
-								logMessage(">> Receiving: " + line);
-							}
+							byte data = (byte) inStream.read();
+							logMessage(">> Receiving: " + String.format("%02X", data));
 						}
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -198,27 +204,11 @@ public class BluetoothUtility extends Activity{
 	}
 
 	private void sendData(int message){
-		byte[] msgBuffer = new byte[2];
 		
-		msgBuffer[0] = (byte)message;
-		msgBuffer[1] = (byte)'\n';
-		
-		Log.d(TAG, "...Send data: " + message + "...");
+		logMessage("...Send data: " + String.format("%02X", (byte)message) + "...");
 
 		try {
-			outStream.write(msgBuffer);
-		} catch (IOException e) {
-			logMessage("In onResume() and an exception occurred during write: " + e.getMessage());      
-		}
-	}
-	
-	private void sendData(String message) {
-		byte[] msgBuffer = (message + "\n").getBytes();
-
-		Log.d(TAG, "...Send data: " + message + "...");
-
-		try {
-			outStream.write(msgBuffer);
+			outStream.write((byte)message);
 		} catch (IOException e) {
 			logMessage("In onResume() and an exception occurred during write: " + e.getMessage());      
 		}

@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
@@ -30,7 +31,7 @@ public class BluetoothTransmitter implements ITransmitter{
 
 	StreamConnection conn = null;
 
-	BufferedReader reader = null;
+	InputStream reader = null;
 
 	DataOutputStream writer = null;
 
@@ -60,7 +61,7 @@ public class BluetoothTransmitter implements ITransmitter{
 
 			System.out.println("Client Connected... ");
 
-			reader = new BufferedReader(new InputStreamReader(conn.openInputStream()));
+			reader = conn.openInputStream();
 
 			writer = conn.openDataOutputStream();
 			
@@ -71,18 +72,13 @@ public class BluetoothTransmitter implements ITransmitter{
 				public void run() {
 					while(readerMonitorRunning){
 						try {
-							if(reader.ready()){
-								final String line = reader.readLine();
-								System.out.println(">> Receiving: " + line);
-								byte[] data = line.getBytes();
-								if(data[0] == -2){	// java doesn't support unsigned bytes, so -2 :: 0xFE
-									acknowledgementReceived = true;
-									System.out.println("RECEIVED ACK RECEIVED!!!!");
-								}else if(data[0] == -1){
-									acknowledgementComplete = true;
-									System.out.println("RECEIVED ACK COMPLETE!!!!");
-								}
+							int data = reader.read();
+							if(data == 0xFE){	// java doesn't support unsigned bytes, so -2 :: 0xFE
+								acknowledgementReceived = true;
+							}else if(data == 0xFD){
+								acknowledgementComplete = true;
 							}
+							System.out.println(">>> Receiving: " + String.format("%02X", data));
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
@@ -113,15 +109,15 @@ public class BluetoothTransmitter implements ITransmitter{
 	public void sendCommand(int cmd) {
 		try {
 			System.out.println("[BT] Sending Command: " + cmd);
-			writer.write(cmd);
-			writer.write('\n');
+			writer.write((byte)cmd);
 			
-			while(!acknowledgementReceived){
+			while(!(acknowledgementReceived && acknowledgementComplete)){
 				Thread.sleep(50);
 			}
 			
 			// reset acknowledgements
 			acknowledgementReceived = false;
+			acknowledgementComplete = false;
 			
 		} catch (IOException e) {
 			e.printStackTrace();

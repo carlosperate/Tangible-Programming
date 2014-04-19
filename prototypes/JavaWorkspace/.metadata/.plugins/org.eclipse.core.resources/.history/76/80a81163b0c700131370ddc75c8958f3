@@ -1,0 +1,12 @@
+package communication;
+
+import ast.Command;
+
+public interface ITransmitter {
+	
+	void setup();
+
+	void sendCommand(Command cmd);
+
+	void shutdown();
+}
