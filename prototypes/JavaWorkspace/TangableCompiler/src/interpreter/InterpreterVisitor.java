@@ -1,6 +1,9 @@
 package interpreter;
 
+import java.util.ArrayList;
 import java.util.Stack;
+
+import communication.ITransmitter;
 
 import ast.Command;
 import ast.LiteralNumber;
@@ -19,6 +22,11 @@ import ast.Visitor;
 public class InterpreterVisitor implements Visitor{
 
 	/**
+	 * List of Transmitters
+	 */
+	private final ArrayList<ITransmitter> transmitters = new ArrayList<ITransmitter>();
+	
+	/**
 	 * Project Stack. Stores variables and resolved sub branches of the AST
 	 */
 	private final Stack<Object> results = new Stack<Object>();
@@ -28,6 +36,9 @@ public class InterpreterVisitor implements Visitor{
 	 */
 	private int indentCnt = 0;
 	
+	public void addTransmitter(ITransmitter t){
+		transmitters.add(t);
+	}
 	
 	@Override
 	public void visit(LiteralNumber number) {
@@ -36,7 +47,9 @@ public class InterpreterVisitor implements Visitor{
 	
 	@Override
 	public void visit(Command cmd) {
-		System.out.println(getIndentation() + cmd.name);
+		for(ITransmitter t : transmitters){
+			t.sendCommand(cmd);
+		}
 		try {
 			Thread.sleep(cmd.waitTime);
 		} catch (InterruptedException e) {

@@ -1,5 +1,6 @@
 package tangableCompilerTestingBed;
 
+import communication.BluetoothTransmitter;
 import compilers.AnsiCGenerator;
 import compilers.ArduinoGenerator;
 import compilers.JavaGenerator;
@@ -27,7 +28,7 @@ public class Main {
 		}
 
 		System.out.println("Language Generation Complete");
-
+		
 		/**
 		 * Using the supplied .tang file, attempt to convert the primitive token ID's into
 		 * valid tokens ready to send to the application
@@ -80,7 +81,15 @@ public class Main {
 		/**
 		 * Interpret the application 
 		 */
-		p.acceptPreOrder(new InterpreterVisitor());
+		BluetoothTransmitter bluetoothTransmitter = new BluetoothTransmitter();
+		bluetoothTransmitter.setup();
+		
+		InterpreterVisitor interpreter = new InterpreterVisitor();
+		interpreter.addTransmitter(bluetoothTransmitter);
+		
+		p.acceptPreOrder(interpreter);
+		
+		bluetoothTransmitter.shutdown();
 		
 	}
 }

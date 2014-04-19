@@ -1,0 +1,29 @@
+package communication;
+
+public class BluetoothTransmitter implements ITransmitter{
+
+	
+	
+	@Override
+	public void setup() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void sendCommand(String data) {
+		System.out.println("Bluetooth Sending: " + data);
+	}
+
+	@Override
+	public void sendCommand(int data) {
+		System.out.println("Bluetooth Sending: " + data);
+	}
+
+	@Override
+	public void shutdown() {
+		// TODO Auto-generated method stub
+		
+	}
+
+}
