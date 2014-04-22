@@ -1,0 +1,7 @@
+package communication;
+
+public interface ITransmitter {
+
+	void sendCommand(String data);
+	void sendCommand(int data);
+}

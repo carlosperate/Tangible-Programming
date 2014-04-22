@@ -1,6 +1,0 @@
-package arena;
-
-public class SceneNode {
-
-	public int xPos;
-}

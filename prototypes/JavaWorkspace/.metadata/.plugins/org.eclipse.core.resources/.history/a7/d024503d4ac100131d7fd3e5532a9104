@@ -1,9 +1,0 @@
-package arena;
-
-public abstract class SceneNode {
-
-	public int xPos;
-	public int yPos;
-	
-	public abstract void Draw(Graphics); 
-}

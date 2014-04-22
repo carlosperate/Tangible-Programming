@@ -1,0 +1,15 @@
+import sys
+
+Forward()
+Forward()
+Backward()
+Forward()
+Forward()
+Backward()
+Forward()
+Forward()
+Backward()
+Forward()
+Forward()
+Backward()
+Beep()

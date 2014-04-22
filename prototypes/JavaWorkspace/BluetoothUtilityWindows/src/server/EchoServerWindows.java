@@ -1,8 +1,11 @@
 package server;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
 import javax.bluetooth.*;
 import javax.microedition.io.*;
@@ -23,6 +26,10 @@ public class EchoServerWindows {
 	
 	BufferedReader reader = null;
 	
+	DataOutputStream writer = null;
+	
+	boolean isRunning = true;
+	
 	public EchoServerWindows(){
 		try{
 			
@@ -39,13 +46,24 @@ public class EchoServerWindows {
 			conn = server.acceptAndOpen();
 			
 			System.out.println("Client Connected...");
-			
+
 			reader = new BufferedReader(new InputStreamReader(conn.openDataInputStream()));
+			
+			writer = conn.openDataOutputStream();
+			
 			String cmd = "";
 			
-			while(!(cmd = reader.readLine()).equals("EXIT\n")){
-				System.out.println("Received: " + cmd);
+			while(isRunning){
+				try {
+					cmd = reader.readLine();
+					System.out.println("Received: " + cmd);
+					sendData(cmd);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
+			
+			isRunning = false;
 
 		}catch(Exception e){
 			e.printStackTrace();
@@ -60,8 +78,19 @@ public class EchoServerWindows {
 		}
 	}
 	
+	public void sendData(String data){
+		try {
+			System.out.println("Sending: " + data);
+			data += "\n";
+			writer.write(data.getBytes());
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.exit(0);
+		}
+	}
+	
 	public static void main(String[] args){
 		new EchoServerWindows();
 	}
-	
 }
