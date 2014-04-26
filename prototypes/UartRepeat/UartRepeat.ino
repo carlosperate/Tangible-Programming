@@ -23,7 +23,7 @@ void loop() {
   /* Wait for data  */
   if( Serial.available() > 0 ) {    
     SerialInByte = Serial.read();
-    Serial.println("Received: 0x");
+    Serial.print("Received: 0x");
     Serial.println(SerialInByte, HEX);
     
     /* Toggle LED, not ideal but fast*/
