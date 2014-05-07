@@ -7,24 +7,25 @@
 // Receives 0xFE -> Responds with 0xFE -> Beeps -> Sends 0xFD
 // Receives l, r, f, b -> Moves robot -> Sends 0xFD
 
-// Version 0.03
+// Version 0.04
 // Version Notes
 // 0.01 - Untested but compiles.
 // 0.02 - Tested - Responds to serial commands correctly, Fixed servo pin allocation moved to pins 10 and 11.
 // 0.03 - Untested - Modified delays for movement to be #defines to make it easier to adjust them. Defines for ACK and DONE too.
+// 0.04 - Tested on Boe-Bot - Delays modified for 15cm movement. Additional confirmation beeps added.
 
 // Connection Details
-// Left Motor on Pin 10
-// Right Motor on Pin 11
+// Left Motor on Pin 11
+// Right Motor on Pin 10
 // Piezo Buzzer on Pin 4
 
 #include <Servo.h>
 
 // Movement Delays
 // Turn Delay is how long the robot will move to complete a 90 degree turn
-#define TURN_DELAY 1000
+#define TURN_DELAY 530
 // Turn Delay is how long the robot will move to move the length of the robot (1 unit)
-#define MOVE_DELAY 1000
+#define MOVE_DELAY 789
 
 //ICD Definitions
 //ACK is the response sent when the Arduino recieves an expected command from via the serial link
@@ -41,7 +42,9 @@ void setup()
   tone(4, 3000, 1000);
   delay(1000);
   servoLeft.attach(11);
-  servoRight.attach(10); 
+  servoRight.attach(10);
+  servoLeft.writeMicroseconds(1500);     // Stop the motors so their is no jitter
+  servoRight.writeMicroseconds(1500);  
 }
 
 void loop()
@@ -57,9 +60,11 @@ void serialEvent()
   while(Serial.available())
   {
     char inChar = (char)Serial.read();
-    if (inChar == ACK)
+    if (inChar == ACK || inChar == 't')
     {
       Serial.write(ACK);  //echo to say we are here.
+      tone(4, 3000, 250);  //beep to make the connection known
+      delay(500);
       tone(4, 3000, 250);  //beep to make the connection known
       Serial.write(DONE);  //echo to say we are done.
     }
