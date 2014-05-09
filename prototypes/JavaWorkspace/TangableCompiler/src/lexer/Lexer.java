@@ -29,6 +29,13 @@ public class Lexer {
 	public static final Stack<Token> tokenList = new Stack<Token>();
 
 	/**
+	 * Clear lexer of all tokens
+	 */
+	public static void clear(){
+		tokenList.clear();
+	}
+	
+	/**
 	 * Lex's supplied CSV file
 	 * @param fileName - file to be lexed
 	 * @return false is file was unable to be lexed correctly, true is successful
@@ -119,6 +126,7 @@ public class Lexer {
 
 		return true;
 	}
+	
 	/**
 	 * Flip the token stack. Recursively called
 	 * @param s
