@@ -67,7 +67,7 @@ public class LanguageDefinition {
 
 		try {
 			File xmlFile = new File(langDefinitionFileName);
-
+			
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 
