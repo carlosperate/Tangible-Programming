@@ -38,20 +38,12 @@ public class ImageReconginition {
 
 		StringBuilder result = new StringBuilder();
 		List<TopCode> codes = null;
-		ByteBuffer imageDataRaw;
-		IntBuffer imageDataSampled;
 		int[] imageData = new int[webcam.getViewSize().width * webcam.getViewSize().height];
-
 		webcam.getImage().getRGB(0, 0, webcam.getViewSize().width, webcam.getViewSize().height, imageData, 0, 0);
-		//imageDataSampled = imageDataRaw.asIntBuffer();
-		
-		//imageData = new int[imageDataSampled.limit()];
-		//imageDataSampled.get(imageData);
-		
+
 		try {
 			ImageIO.write(webcam.getImage(), "PNG", new File("hello-world.png"));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
