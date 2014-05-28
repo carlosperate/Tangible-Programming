@@ -24,6 +24,8 @@ import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.io.gpio.trigger.GpioBlinkStopStateTrigger;
 
+import emulation.GpioPinDigitalOutputWrapper;
+import application.OS;
 import ast.Command;
 
 public class BluetoothTransmitter implements ITransmitter{
@@ -54,10 +56,10 @@ public class BluetoothTransmitter implements ITransmitter{
 
 	boolean acknowledgementComplete = false;			// received once command is complete
 
-	GpioPinDigitalOutput bluetoothCommStatusLed;
+	GpioPinDigitalOutputWrapper bluetoothCommStatusLed;
 
 	@Override
-	public void setup(GpioPinDigitalOutput statusPin) {
+	public void setup(GpioPinDigitalOutputWrapper statusPin) {
 		try{
 
 			bluetoothCommStatusLed = statusPin;
@@ -83,7 +85,7 @@ public class BluetoothTransmitter implements ITransmitter{
 			writer = conn.openDataOutputStream();
 
 			bluetoothCommStatusLed.blink(0);
-			bluetoothCommStatusLed.setState(PinState.HIGH);
+			bluetoothCommStatusLed.turnOn();
 
 			// TODO Temp Wait to simulate hitting the GO button
 			Thread.sleep(2000);

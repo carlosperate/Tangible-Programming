@@ -1,5 +1,8 @@
 package application;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioPinDigitalInput;
@@ -15,10 +18,12 @@ import interpreter.InterpreterVisitor;
 import lexer.Lexer;
 import ast.Program;
 import core.LanguageDefinition;
+import emulation.ControlBox;
+import emulation.GpioPinDigitalOutputWrapper;
 import exceptions.SyntaxException;
 
 public class Application {
-
+	
 	/**
 	 * Global Bluetooth Transmitter
 	 */
@@ -27,22 +32,22 @@ public class Application {
 	/**
 	 * GPIO Controller, Handling GPIO. Uses Singleton pattern
 	 */
-	final GpioController gpio = GpioFactory.getInstance();
+	private GpioController gpio;
 
 	/**
 	 * Pin to control Bluetooth status output
 	 */
-	private GpioPinDigitalOutput bluetoothCommLed;
+	private GpioPinDigitalOutputWrapper bluetoothCommLed;
 
 	/**
 	 * Pin to control ready LED
 	 */
-	private GpioPinDigitalOutput readyLed;
+	private GpioPinDigitalOutputWrapper readyLed;
 
 	/**
 	 * Pin to control busy LED 
 	 */
-	private GpioPinDigitalOutput busyLed;
+	private GpioPinDigitalOutputWrapper busyLed;
 
 	/**
 	 * Pin to control green Go Button
@@ -82,40 +87,67 @@ public class Application {
 
 	public void start(){
 
-		/**
-		 * Setup HW GPIO Configuration
-		 */
-		System.out.println("Setting up GPIO Outputs...");
-
-		bluetoothCommLed = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_00, "Bluetooth Communication Status LED", PinState.LOW);
-
-		readyLed = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_03, "Ready LED", PinState.LOW);
-
-		busyLed = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_04, "Busy LED", PinState.LOW);
-
-		System.out.println("Setting up GPIO Inputs...");
-
-		goButton = gpio.provisionDigitalInputPin(RaspiPin.GPIO_06, "Go Button", PinPullResistance.PULL_UP);
-
-		leftSwitch = gpio.provisionDigitalInputPin(RaspiPin.GPIO_05, "Left Switch", PinPullResistance.PULL_UP);
-
-		rightSwitch = gpio.provisionDigitalInputPin(RaspiPin.GPIO_01, "Right Switch", PinPullResistance.PULL_UP);
+		bluetoothCommLed = new GpioPinDigitalOutputWrapper();
+		readyLed = new GpioPinDigitalOutputWrapper();
+		busyLed = new GpioPinDigitalOutputWrapper();
 		
-		bluetoothCommLed.setShutdownOptions(true, PinState.LOW);
-		readyLed.setShutdownOptions(true, PinState.LOW);
-		busyLed.setShutdownOptions(true, PinState.LOW);
+		if(OS.isWindows()){
+			System.out.println("Windows OS");
+			System.out.println("Starting Software Emulation...");
 
-		System.out.println("Testing LED's");
-		// Switch each LED on for 1 second to show LED out working
-		bluetoothCommLed.pulse(1000, true);
-		readyLed.pulse(1000, true);
-		busyLed.pulse(1000, true);
+			ControlBox cb = new ControlBox();
+			
+			System.out.println("Testing LED's");
+			cb.testLEDs();
+			
+			bluetoothCommLed.setSoftwareLed(cb.getBluetoothLed());
+			readyLed.setSoftwareLed(cb.getReadyLed());
+			busyLed.setSoftwareLed(cb.getBusyLed());
+			
+			cb.addGoButtonListener(new GoButtonPressedListener());
+			cb.addRightSwitchListener(new LeftSwitchPressedListener());
+			cb.addLeftSwitchListener(new RightSwitchPressedListener());
+			
+		}else if(OS.isUnix()){
+			System.out.println("Unix OS");
+			System.out.println("Configuring Hardware...");
+			/**
+			 * Setup HW GPIO Configuration on linux
+			 */
+			gpio = GpioFactory.getInstance();
+			
+			System.out.println("Setting up GPIO Outputs...");
+			GpioPinDigitalOutput bluetoothHWLed = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_00, "Bluetooth Communication Status LED", PinState.LOW);
+			GpioPinDigitalOutput readyHWLed = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_03, "Ready LED", PinState.LOW);
+			GpioPinDigitalOutput busyHWLed = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_04, "Busy LED", PinState.LOW);
+			bluetoothHWLed.setShutdownOptions(true, PinState.LOW);
+			readyHWLed.setShutdownOptions(true, PinState.LOW);
+			busyHWLed.setShutdownOptions(true, PinState.LOW);
+			
+			bluetoothCommLed.setHardwareLed(bluetoothHWLed);
+			readyLed.setHardwareLed(readyHWLed);
+			busyLed.setHardwareLed(busyHWLed);
+			
+	
+			System.out.println("Setting up GPIO Inputs...");
+			goButton = gpio.provisionDigitalInputPin(RaspiPin.GPIO_06, "Go Button", PinPullResistance.PULL_UP);
+			leftSwitch = gpio.provisionDigitalInputPin(RaspiPin.GPIO_05, "Left Switch", PinPullResistance.PULL_UP);
+			rightSwitch = gpio.provisionDigitalInputPin(RaspiPin.GPIO_01, "Right Switch", PinPullResistance.PULL_UP);
+			
+	
+			System.out.println("Testing LED's");
+			
+			// Switch each LED on for 1 second to show LED out working
+			bluetoothCommLed.pulse(1000, true);
+			readyLed.pulse(1000, true);
+			busyLed.pulse(1000, true);
+	
+			//TODO devise a method to test inputs?
+			goButton.addListener(new GoButtonPressedListener());
+			leftSwitch.addListener(new LeftSwitchPressedListener());
+			rightSwitch.addListener(new RightSwitchPressedListener());
 
-		//TODO devise a method to test inputs?
-		goButton.addListener(new GoButtonPressedListener());
-		leftSwitch.addListener(new LeftSwitchPressedListener());
-		rightSwitch.addListener(new RightSwitchPressedListener());
-
+		}
 		if(!LanguageDefinition.getInstance().SetupLanguage("langdefinition.xml")){
 			System.err.println("Language Setup Failed");
 			return;
@@ -128,7 +160,7 @@ public class Application {
 
 		System.out.println("Entering Application Loop..");
 
-		readyLed.setState(PinState.HIGH);
+		readyLed.turnOn();
 		
 		while(true){
 			// infinite loop while application is in use.
@@ -136,12 +168,21 @@ public class Application {
 		}
 	}
 
-	public class GoButtonPressedListener implements GpioPinListenerDigital{
+	public class GoButtonPressedListener implements GpioPinListenerDigital, ActionListener{
 		@Override
 		public void handleGpioPinDigitalStateChangeEvent(
 				GpioPinDigitalStateChangeEvent event) {
+			 GoButtonAction();
+		}
 
-			// prevents a 2 events being fired
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			 GoButtonAction();
+		}
+		
+		public void GoButtonAction(){
+
+			// prevents 2 events being fired
 			goButtonCount++;
 			if((goButtonCount % 2) == 0){
 
@@ -149,8 +190,8 @@ public class Application {
 					runningTangableApplication = true;
 					
 					// Switch LED states to show busy status
-					readyLed.setState(PinState.LOW);
-					busyLed.setState(PinState.HIGH);
+					readyLed.turnOff();
+					busyLed.turnOn();
 					
 					//TODO Code to capture image from webcam, and produce sample application string
 
@@ -177,8 +218,8 @@ public class Application {
 					p.acceptPreOrder(interpreter);
 
 					// Set LED states to show ready status
-					readyLed.setState(PinState.HIGH);
-					busyLed.setState(PinState.LOW);
+					readyLed.turnOn();
+					busyLed.turnOff();
 					
 					runningTangableApplication = false;
 				}
@@ -186,11 +227,20 @@ public class Application {
 		}
 	}
 
-	public class LeftSwitchPressedListener implements GpioPinListenerDigital{
+	public class LeftSwitchPressedListener implements GpioPinListenerDigital, ActionListener{
+		
 		@Override
 		public void handleGpioPinDigitalStateChangeEvent(
 				GpioPinDigitalStateChangeEvent event) {
-
+			LeftSwitchAction();
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			LeftSwitchAction();
+		}
+		
+		public void LeftSwitchAction(){
 			leftSwitchCount++;
 
 			if((leftSwitchCount % 2) == 0){
@@ -205,14 +255,24 @@ public class Application {
 		}
 	}
 
-	public class RightSwitchPressedListener implements GpioPinListenerDigital{
+	public class RightSwitchPressedListener implements GpioPinListenerDigital, ActionListener{
+		
 		@Override
 		public void handleGpioPinDigitalStateChangeEvent(
 				GpioPinDigitalStateChangeEvent event) {
+			RightSwitchAction();
+		}
+		
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			RightSwitchAction();
+		}
+		
+		public void RightSwitchAction(){
 			rightSwitchCount++;
 
 			if((rightSwitchCount % 2) == 0){
-				System.out.println(event.getPin().getName() + " triggered Pressed");
+				System.out.println("Right Switch triggered");
 				
 				// TODO Define function of this switch
 			}

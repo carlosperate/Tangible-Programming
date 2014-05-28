@@ -4,6 +4,10 @@
 	<classpathentry kind="lib" path="bluecove-2.1.0.jar"/>
 	<classpathentry kind="lib" path="bluecove-gpl-2.1.0.jar"/>
 	<classpathentry kind="lib" path="pi4j-core.jar"/>
+	<classpathentry kind="lib" path="topcodes.jar"/>
+	<classpathentry kind="lib" path="webcam-capture-0.3.10-RC6.jar"/>
+	<classpathentry kind="lib" path="bridj-0.7-20131007.003529-54.jar"/>
+	<classpathentry kind="lib" path="slf4j-api-1.7.2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
