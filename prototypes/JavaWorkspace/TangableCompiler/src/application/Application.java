@@ -14,6 +14,7 @@ import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
 
 import communication.BluetoothTransmitter;
+import imageRecongnition.TopCodesController;
 import interpreter.InterpreterVisitor;
 import lexer.Lexer;
 import ast.Program;
@@ -63,6 +64,11 @@ public class Application {
 	 * Pin to control right switch state
 	 */
 	private GpioPinDigitalInput rightSwitch;
+	
+	/**
+	 * Topcode Interpreter
+	 */
+	private TopCodesController topcodes;
 
 	/**
 	 * Counter used to measure number of go button events fired
@@ -87,6 +93,8 @@ public class Application {
 
 	public void start(){
 
+		topcodes = new TopCodesController();
+		
 		bluetoothCommLed = new GpioPinDigitalOutputWrapper();
 		readyLed = new GpioPinDigitalOutputWrapper();
 		busyLed = new GpioPinDigitalOutputWrapper();
@@ -192,13 +200,11 @@ public class Application {
 					// Switch LED states to show busy status
 					readyLed.turnOff();
 					busyLed.turnOn();
-					
-					//TODO Code to capture image from webcam, and produce sample application string
 
 					try {
 						// Clear old application from lexer, and lex new token string
 						Lexer.clear();
-						Lexer.Lex("sampleProgram1.tang");
+						Lexer.Lex(topcodes.codeNumbers(), ",");
 					} catch (SyntaxException e) {
 						System.err.println("Lexing Failed");
 						return;
