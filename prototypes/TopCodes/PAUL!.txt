@@ -1,0 +1,11 @@
+Hi Paul,
+
+
+The program returns null if it recieves an error.
+
+
+You need to install the following onto your pi for the webcam to work:
+
+
+sudo apt-get install fswebcam
+
