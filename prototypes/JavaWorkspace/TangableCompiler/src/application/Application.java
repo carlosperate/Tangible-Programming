@@ -17,6 +17,7 @@ import communication.BluetoothTransmitter;
 import imageRecongnition.TopCodesController;
 import interpreter.InterpreterVisitor;
 import lexer.Lexer;
+import ast.Command;
 import ast.Program;
 import core.LanguageDefinition;
 import emulation.ControlBox;
@@ -90,6 +91,8 @@ public class Application {
 	 * Prevents the user from starting a second application while busy
 	 */
 	private boolean runningTangableApplication = false;
+	
+	InterpreterVisitor interpreter;
 
 	public void start(){
 
@@ -205,6 +208,7 @@ public class Application {
 						// Clear old application from lexer, and lex new token string
 						Lexer.clear();
 						Lexer.Lex(topcodes.codeNumbers(), ",");
+						//Lexer.Lex("sampleProgram1.tang");
 					} catch (SyntaxException e) {
 						System.err.println("Lexing Failed");
 						return;
@@ -217,7 +221,7 @@ public class Application {
 					p.parse();
 
 					// Attach transmitter to interpreter
-					InterpreterVisitor interpreter = new InterpreterVisitor();
+					interpreter = new InterpreterVisitor();
 					interpreter.addTransmitter(bluetoothTransmitter);
 
 					// Interpret Tangible application
@@ -280,7 +284,8 @@ public class Application {
 			if((rightSwitchCount % 2) == 0){
 				System.out.println("Right Switch triggered");
 				
-				// TODO Define function of this switch
+				interpreter.transmitters.get(0).sendCommand(254);
+				
 			}
 		}
 	}
