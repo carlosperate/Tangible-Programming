@@ -2,6 +2,7 @@ package application;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
@@ -257,8 +258,13 @@ public class Application {
 
 				System.out.println("Shutdown Sequence Started...");
 
-				// TODO Shutdown Bluetooth correctly
-				// TODO Any Shutdown require by BoeBot??
+				String ls = "sudo halt";
+
+					try {
+						Runtime.getRuntime().exec(ls);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				
 				System.exit(0);
 			}

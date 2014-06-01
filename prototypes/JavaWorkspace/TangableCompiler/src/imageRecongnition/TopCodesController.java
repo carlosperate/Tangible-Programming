@@ -28,7 +28,6 @@ public class TopCodesController{
 
 		String ls = "fswebcam -r 640x480 -d /dev/video0 Commands.jpg";
 
-
 		try{
 
 			Process pGrep = Runtime.getRuntime().exec(ls); // Capture an image from webcam
@@ -36,8 +35,10 @@ public class TopCodesController{
 			pGrep.waitFor();
 
 			img = ImageIO.read(new File("Commands.jpg"));
+			System.out.println("Scanning Image: Commands.jpg");
 			codes = scanner.scan(img);
-
+			System.out.println("Scan Complete!");
+			
 		}catch (IOException e){
 			return null;
 		}
