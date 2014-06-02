@@ -24,7 +24,7 @@ public class InterpreterVisitor implements Visitor{
 	/**
 	 * List of Transmitters
 	 */
-	private final ArrayList<ITransmitter> transmitters = new ArrayList<ITransmitter>();
+	public final ArrayList<ITransmitter> transmitters = new ArrayList<ITransmitter>();
 	
 	/**
 	 * Project Stack. Stores variables and resolved sub branches of the AST
