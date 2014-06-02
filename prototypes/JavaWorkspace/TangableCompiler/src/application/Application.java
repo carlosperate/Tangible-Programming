@@ -208,7 +208,7 @@ public class Application {
 					try {
 						// Clear old application from lexer, and lex new token string
 						Lexer.clear();
-						Lexer.Lex(topcodes.codeNumbers(), ",");
+						Lexer.Lex(topcodes.codeNumbers(null), ",");
 						//Lexer.Lex("sampleProgram1.tang");
 					} catch (SyntaxException e) {
 						System.err.println("Lexing Failed");

@@ -4,8 +4,12 @@ package imageRecongnition;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Arrays;
+
 import javax.imageio.ImageIO;
 
 public class TopCodesController{
@@ -18,11 +22,11 @@ public class TopCodesController{
 		scanner  = new Scanner();
 	}
 
-	public String codeNumbers(){
+	public String codeNumbers(List<TopCode> sampleCodes){
 
+		StringBuilder builder = new StringBuilder();
+		
 		List<TopCode> codes = null;
-
-		String imageCodes = null;
 
 		BufferedImage img = null;
 
@@ -30,6 +34,7 @@ public class TopCodesController{
 
 		try{
 
+			if(sampleCodes == null){
 			Process pGrep = Runtime.getRuntime().exec(ls); // Capture an image from webcam
 
 			pGrep.waitFor();
@@ -38,6 +43,9 @@ public class TopCodesController{
 			System.out.println("Scanning Image: Commands.jpg");
 			codes = scanner.scan(img);
 			System.out.println("Scan Complete!");
+			}else{
+				codes = sampleCodes;
+			}
 			
 		}catch (IOException e){
 			return null;
@@ -52,48 +60,59 @@ public class TopCodesController{
 
 			int size = codes.size();
 
-			System.out.println(size);
+			System.out.println("Found " + size + " Topcodes");
 
-			int[] codesarray = new int[size];
+			Collections.sort(codes, new Comparator<TopCode>() {
 
-			int counter = 0;
-
+				@Override
+				public int compare(TopCode o1, TopCode o2) {
+					if(o1.getCode() == o2.getCode()){
+						return 0;
+					}else if(o1.getCode() > o2.getCode()){
+						return 1;
+					}else if(o1.getCode() < o2.getCode()){
+						return -1;
+					}
+					
+					return 0;
+				}
+			});
+			
+			
 			for (TopCode top : codes) {
 
-
-				if(counter == 0){
-
-					codesarray[0] = top.getCode();
-					counter = counter+1;
-				}else{
-
-					codesarray[counter] = top.getCode();
-					counter = counter+1;
-
-				}
-
+				builder.append(top.getCode() + ",");
+			
 			}
 
+			
+			builder.deleteCharAt(builder.length() - 1);
+			
+			System.out.println(builder.toString());
+			
+			return builder.toString();
 
-			Arrays.sort(codesarray);
-			System.out.println(Arrays.toString(codesarray));
-
-			imageCodes = Arrays.toString(codesarray);
-
-			imageCodes = imageCodes.substring(1, imageCodes.length()-1);
-
+		}else{
+			System.out.println("No Topcodes Found!");
 		}
 
-
-
-
-
-		return imageCodes;
-	}	
-
-
-
-
-
+		return null;
+	}
+	
+	public static void main(String[] args){
+		TopCodesController controller = new TopCodesController();
+		
+		List<TopCode> sampleCodes = new ArrayList<TopCode>();
+		
+		sampleCodes.add(new TopCode(97));
+		sampleCodes.add(new TopCode(105));
+		sampleCodes.add(new TopCode(301));
+		sampleCodes.add(new TopCode(303));
+		sampleCodes.add(new TopCode(105));
+		sampleCodes.add(new TopCode(303));
+		
+		
+		controller.codeNumbers(sampleCodes);
+	}
 }
 
