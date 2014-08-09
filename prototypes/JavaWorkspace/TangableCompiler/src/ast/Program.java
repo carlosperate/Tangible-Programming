@@ -5,12 +5,17 @@ import java.util.List;
 import lexer.Lexer;
 import lexer.Token;
 
+/*
+ * Represents a full Tangible application
+ */
 public class Program extends ASTToken{
 
+	// List of resolved statements held within the application
 	public final List<Statement> statements = new LinkedList<Statement>();
 
 	@Override
 	public ASTToken parse() {
+		// Keep parsing the token until the lexer is empty
 		while(!Lexer.isEmpty()){
 			statements.add(parseNextStatement());
 		}
@@ -21,8 +26,10 @@ public class Program extends ASTToken{
 		Token next = Lexer.peek();
 
 		if(next instanceof Command){
+			// Parse a new command
 			return (Command) new Command().parse();
 		}else if (next instanceof Keyword){
+			// Parse a new Loop
 			if(((Keyword)next).name.equals("Loop-Start")){
 				return (Loop) new Loop().parse();
 			}

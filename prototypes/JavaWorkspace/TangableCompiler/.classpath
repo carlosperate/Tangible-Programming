@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="bluecove-2.1.0.jar"/>
-	<classpathentry kind="lib" path="bluecove-gpl-2.1.0.jar"/>
 	<classpathentry kind="lib" path="pi4j-core.jar"/>
+	<classpathentry kind="lib" path="C:/Projects/Tangible-Programming/prototypes/JavaWorkspace/TangableCompiler/bluecove-2.1.0.jar"/>
+	<classpathentry kind="lib" path="C:/Projects/Tangible-Programming/prototypes/JavaWorkspace/TangableCompiler/bluecove-gpl-2.1.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

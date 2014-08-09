@@ -1,14 +1,7 @@
 package application;
 
-import com.pi4j.io.gpio.GpioController;
-import com.pi4j.io.gpio.GpioFactory;
-import com.pi4j.io.gpio.GpioPinDigitalInput;
-import com.pi4j.io.gpio.GpioPinDigitalOutput;
-import com.pi4j.io.gpio.PinPullResistance;
-import com.pi4j.io.gpio.PinState;
-import com.pi4j.io.gpio.RaspiPin;
-import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
-import com.pi4j.io.gpio.event.GpioPinListenerDigital;
+import com.pi4j.io.gpio.*;
+import com.pi4j.io.gpio.event.*;
 
 import communication.BluetoothTransmitter;
 import interpreter.InterpreterVisitor;
@@ -106,16 +99,17 @@ public class Application {
 		busyLed.setShutdownOptions(true, PinState.LOW);
 
 		System.out.println("Testing LED's");
+		
 		// Switch each LED on for 1 second to show LED out working
 		bluetoothCommLed.pulse(1000, true);
 		readyLed.pulse(1000, true);
 		busyLed.pulse(1000, true);
 
-		//TODO devise a method to test inputs?
 		goButton.addListener(new GoButtonPressedListener());
 		leftSwitch.addListener(new LeftSwitchPressedListener());
 		rightSwitch.addListener(new RightSwitchPressedListener());
 
+		// Setup Language token definitions using the supplied definition file
 		if(!LanguageDefinition.getInstance().SetupLanguage("langdefinition.xml")){
 			System.err.println("Language Setup Failed");
 			return;
@@ -133,6 +127,8 @@ public class Application {
 		while(true){
 			// infinite loop while application is in use.
 			// from this point the application is completely event driven
+			// Application is terminated at an event
+			// TODO: Possibly add Console based termination control
 		}
 	}
 
@@ -141,7 +137,7 @@ public class Application {
 		public void handleGpioPinDigitalStateChangeEvent(
 				GpioPinDigitalStateChangeEvent event) {
 
-			// prevents a 2 events being fired
+			// prevents a 2 events being fired - Limitation of the library
 			goButtonCount++;
 			if((goButtonCount % 2) == 0){
 
@@ -197,7 +193,7 @@ public class Application {
 
 				System.out.println("Shutdown Sequence Started...");
 
-				// TODO Shutdown Bluetooth correctly
+				// TODO Shutdown Bluetooth correctly?
 				// TODO Any Shutdown require by BoeBot??
 				
 				System.exit(0);
