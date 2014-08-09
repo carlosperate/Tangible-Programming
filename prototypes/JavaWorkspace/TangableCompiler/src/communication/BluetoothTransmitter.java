@@ -1,134 +1,79 @@
 package communication;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import java.io.OutputStream;
+import java.util.Enumeration;
+import java.util.TooManyListenersException;
 
-import javax.bluetooth.DiscoveryAgent;
-import javax.bluetooth.LocalDevice;
-import javax.bluetooth.UUID;
-import javax.microedition.io.Connector;
-import javax.microedition.io.StreamConnection;
-import javax.microedition.io.StreamConnectionNotifier;
-
-import com.pi4j.io.gpio.GpioController;
-import com.pi4j.io.gpio.GpioFactory;
-import com.pi4j.io.gpio.GpioPinDigitalInput;
-import com.pi4j.io.gpio.GpioPinDigitalOutput;
-import com.pi4j.io.gpio.PinPullResistance;
-import com.pi4j.io.gpio.PinState;
-import com.pi4j.io.gpio.RaspiPin;
-import com.pi4j.io.gpio.trigger.GpioBlinkStopStateTrigger;
-
+import emulation.GpioPinDigitalOutputWrapper;
+import gnu.io.CommPortIdentifier;
+import gnu.io.SerialPort;
+import gnu.io.SerialPortEvent;
+import gnu.io.SerialPortEventListener;
 import ast.Command;
 
-public class BluetoothTransmitter implements ITransmitter{
+public class BluetoothTransmitter implements ITransmitter, SerialPortEventListener{
 
-	public final UUID uuid = new UUID("1101", false);
+	SerialPort serialPort = null;
 
-	public final String name = "Window Echo Server";
+	private static final String PORT_NAMES[] = {
+		"/dev/tty.usbmodem",	// Mac OS X
+		"/dev/rfcomm",			// Linux
+		"/dev/usbdev",			// Linux
+		"/dev/tty",				// Linux
+		"/dev/serial",			// Linux
+		"COM3",					// Windows
+		"COM9"					// Windows
+	};
 
-	public final String url = "btspp://localhost:" + uuid + ";name=" + name + ";authenticate=false;encrypt=false;";
+	private String appName;
+	private BufferedReader input;
+	private OutputStream output;
 
-	LocalDevice local = null;
-
-	StreamConnectionNotifier server = null;
-
-	StreamConnection conn = null;
-
-	InputStream reader = null;
-
-	DataOutputStream writer = null;
-
-	Thread readerMonitor = null;
-
-	boolean readerMonitorRunning = true;
-	
-	boolean awaitingAcknowledgements = false;
-
-	boolean acknowledgementReceived = false;			// received after sending command
-
-	boolean acknowledgementComplete = false;			// received once command is complete
-
-	GpioPinDigitalOutput bluetoothCommStatusLed;
+	private static final int TIME_OUT = 1000;
+	private static final int DATA_RATE = 9600;
 
 	@Override
-	public void setup(GpioPinDigitalOutput statusPin) {
+	public void setup(GpioPinDigitalOutputWrapper statusPin) {
 		try{
 
-			bluetoothCommStatusLed = statusPin;
+			CommPortIdentifier portId = null;
+			Enumeration portEnum = CommPortIdentifier.getPortIdentifiers();
 
-			System.out.println("Setting device to be discoverable...");
-			local = LocalDevice.getLocalDevice();
-			local.setDiscoverable(DiscoveryAgent.GIAC);
+			System.out.println("Trying:");
+			while(portId == null && portEnum.hasMoreElements()){
 
-			System.out.println("Start advertising service...");
-
-			server = (StreamConnectionNotifier)Connector.open(url);
-
-			System.out.println("Waiting for incoming connection...");
-
-			bluetoothCommStatusLed.blink(500);
-
-			conn = server.acceptAndOpen();
-
-			System.out.println("Client Connected... ");
-
-			reader = conn.openInputStream();
-
-			writer = conn.openDataOutputStream();
-
-			bluetoothCommStatusLed.blink(0);
-			bluetoothCommStatusLed.setState(PinState.HIGH);
-
-			// TODO Temp Wait to simulate hitting the GO button
-			Thread.sleep(2000);
-
-			// Start reader thread monitor
-			readerMonitor = new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-					while(readerMonitorRunning){
-						try {
-							int data = reader.read();
-							switch(data){
-							case 0xFE:
-								acknowledgementReceived = awaitingAcknowledgements ? true : false;
-								break;
-							case 0xFD:
-								acknowledgementComplete = awaitingAcknowledgements ? true : false;
-								break;
-							case 0xFFFFFFFF:
-								readerMonitorRunning = false;
-								break;
-							default:
-								break;
-							}
-							
-							System.out.println(">>> Receiving: " + String.format("%02X", data));
-							
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-
-					}
-
-					try {
-						reader.close();
-					} catch (IOException e) {
-						e.printStackTrace();
+				CommPortIdentifier currPortId = (CommPortIdentifier) portEnum.nextElement();
+				System.out.println("   port" + currPortId.getName());
+				for(String portName : PORT_NAMES){
+					if(currPortId.getName().equals(portName) || currPortId.getName().startsWith(portName)){
+						serialPort = (SerialPort)currPortId.open(appName, TIME_OUT);
+						portId = currPortId;
+						System.out.println("Connected on port" + currPortId.getName());
 					}
 				}
-			});
 
-			readerMonitor.start();
+			}
 
-		}catch(Exception e){
+			if (portId == null) {
+				System.out.println("Oops... Could not connect to Arduino");
+				return;
+			}
+
+			// set port parameters
+			serialPort.setSerialPortParams(DATA_RATE,
+					SerialPort.DATABITS_8,
+					SerialPort.STOPBITS_1,
+					SerialPort.PARITY_NONE);
+
+			input = new BufferedReader(
+					new InputStreamReader(
+							serialPort.getInputStream()));
+
+			return;
+		}
+		catch ( Exception e ) { 
 			e.printStackTrace();
 		}
 	}
@@ -141,44 +86,37 @@ public class BluetoothTransmitter implements ITransmitter{
 	@Override
 	public void sendCommand(int cmd) {
 		try {
-			System.out.println("[BT] Sending Command: " + cmd);
-			writer.write((byte)cmd);
-			awaitingAcknowledgements = true;
-			
-			while(!(acknowledgementReceived && acknowledgementComplete)){
-				Thread.sleep(50);
-			}
-			
-			awaitingAcknowledgements = false;
+			System.out.println("Sending data: '" + cmd +"'");
 
-			// reset acknowledgements
-			acknowledgementReceived = false;
-			acknowledgementComplete = false;
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// open the streams and send the "y" character
+			output = serialPort.getOutputStream();
+			output.write(cmd);
+		} 
+		catch (Exception e) {
+			System.err.println(e.toString());
+			System.exit(0);
 		}
 	}
 
 	@Override
 	public void shutdown() {
-		if(writer != null){
-			try {
-				writer.write('e');
-				writer.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		if ( serialPort != null ) {
+			serialPort.removeEventListener();
+			serialPort.close();
 		}
+	}
+
+	@Override
+	public void serialEvent(SerialPortEvent oEvent) {
+		System.out.println("Event received: " + oEvent.toString());
 
 		try {
-			readerMonitorRunning = false;
-			readerMonitor.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+			String inputLine = input.readLine();
+			System.out.println(inputLine);
+
+
+		}catch (Exception e) {
+			System.err.println(e.toString());
 		}
 	}
 }
