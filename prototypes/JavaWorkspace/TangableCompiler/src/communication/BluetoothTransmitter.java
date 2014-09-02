@@ -6,7 +6,8 @@ import java.io.OutputStream;
 import java.util.Enumeration;
 import java.util.TooManyListenersException;
 
-import emulation.GpioPinDigitalOutputWrapper;
+import com.pi4j.io.gpio.GpioPinDigitalOutput;
+
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
 import gnu.io.SerialPortEvent;
@@ -35,7 +36,7 @@ public class BluetoothTransmitter implements ITransmitter, SerialPortEventListen
 	private static final int DATA_RATE = 9600;
 
 	@Override
-	public void setup(GpioPinDigitalOutputWrapper statusPin) {
+	public void setup(GpioPinDigitalOutput statusPin) {
 		try{
 
 			CommPortIdentifier portId = null;
